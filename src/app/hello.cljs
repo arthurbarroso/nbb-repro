@@ -1,5 +1,8 @@
 (ns app.hello
-  (:require [reagent.core :as r]))
+  (:require [app.events :as events]
+            [app.subs :as subs]
+            [re-frame.core :as re-frame]
+            [reagent.core :as r]))
 
 (defn click-counter [click-count]
   [:div
@@ -11,7 +14,11 @@
 (def click-count (r/atom 0))
 
 (defn hello []
-  [:<>
-   [:p "Hello, repro is running!"]
-   [:p "Here's an example of using a component with state:"]
-   [click-counter click-count]])
+  (let [name (re-frame/subscribe [::subs/name])]
+    [:<>
+     [:p "Hello, repro is running!"]
+     [:p "Here's an example of using a component with state:"]
+     [:p "Name: " @name]
+     [click-counter click-count]
+     [:button {:on-click #(re-frame/dispatch [::events/change-name "test"])}
+      "name changer"]]))
